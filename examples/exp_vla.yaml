@@ -1,0 +1,40 @@
+# VLA 预训练作业示例（8 节点 x 8 卡）
+job_name: vla-pretrain-pi0-v1
+
+resource:
+  partition: gpu
+  qos: normal
+  nodes: 8
+  gpus_per_node: 8
+  cpus_per_task: 16
+  mem_per_node_gb: null            # null = 不限制（用满节点内存）
+  time_limit: "72:00:00"
+
+# pyxis/enroot 容器镜像（EHPC 已装 pyxis 时生效）；注释掉则用宿主机环境
+image: registry-vpc.cn-hangzhou.aliyuncs.com/vla/train:0.1
+
+# host:container；host 路径在集群上（CPFS，数据由 phi-sync 同步好）
+mounts:
+  - /mnt/cpfs/vla_dataset_v1:/data
+  - /mnt/cpfs/checkpoints:/ckpt
+  - /mnt/cpfs/logs:/logs
+
+env:
+  # 值含 ${VAR} 时提交时从本地环境展开，不落明文
+  WANDB_API_KEY: ${WANDB_API_KEY}
+  OMP_NUM_THREADS: "16"
+
+# 多机启动器：torchrun | deepspeed
+launch_backend: torchrun
+
+# 训练命令（SDK 包成 srun + torchrun 多机启动）
+command: |
+  train.py --config configs/pi0_v1.yaml --data /data --ckpt /ckpt/vla-pi0-v1
+
+# sbatch --output/--error 目录（CPFS 路径，登录节点可读）
+log_dir: /mnt/cpfs/logs
+
+requeue:
+  enabled: true                    # 故障自动重提交（Slurm 不原生做，SDK 做）
+  max_retries: 3
+  resume_from: /ckpt/vla-pi0-v1    # 训练代码契约：存在则从最近 ckpt 续训

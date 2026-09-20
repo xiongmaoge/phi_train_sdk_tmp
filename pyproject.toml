@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phi-train-slurm"
+version = "0.1.0"
+description = "phi train infra sdk: submit and manage VLA pretraining jobs on EHPC-Slurm clusters"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+phi-train = "phi_train_slurm.submitter.submit:main"
+
+# 开发/测试依赖（可选）。运行时依赖保持为空：SDK 只用标准库（SSH 走系统 ssh 命令）。
+# yaml extra：JobSpec.from_yaml 需要 pyyaml，核心提交链路不依赖它。
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+yaml = ["pyyaml>=6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools]
+# 仓库根目录即 phi_train_slurm 包（无 src/ 布局）；
+# 打包后 import 名为 phi_train_slurm，避免 job / model 等通用顶级名污染用户环境
+package-dir = { "phi_train_slurm" = "." }
+packages = [
+    "phi_train_slurm",
+    "phi_train_slurm.client",
+    "phi_train_slurm.job",
+    "phi_train_slurm.model",
+    "phi_train_slurm.slurm",
+    "phi_train_slurm.submitter",
+]
+
+# sbatch 脚本模板作为数据文件打进 wheel
+[tool.setuptools.package-data]
+"phi_train_slurm.slurm" = ["templates/*.tpl"]
+
+[tool.setuptools.exclude-package-data]
+"phi_train_slurm.slurm" = [
+    "**/__pycache__/*",
+    "**/*.pyc",
+    "**/*.pyo",
+]

@@ -1,0 +1,16 @@
+# 链路冒烟作业：不占 GPU、几十秒结束，验证 submit -> 扩容 -> 运行 -> 查状态 -> 拉日志
+job_name: phi-smoke-cpu
+
+resource:
+  partition: comp
+  nodes: 1
+  gpus_per_node: 0        # CPU 作业：不申请 GPU
+  cpus_per_task: 2
+  time_limit: "00:10:00"
+
+launch_backend: plain     # 不包 torchrun，srun 直接跑命令
+
+log_dir: /home/phi_logs
+
+command: |
+  echo "host: $(hostname)" && echo "cpus: $(nproc)" && sleep 20 && echo DONE
