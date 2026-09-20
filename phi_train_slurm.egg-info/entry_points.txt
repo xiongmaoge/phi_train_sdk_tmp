@@ -1,2 +1,0 @@
-[console_scripts]
-phi-train = phi_train_slurm.submitter.submit:main

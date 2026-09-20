@@ -1,0 +1,33 @@
+# ---- Python 字节码 / 缓存 ----
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- 打包 / 构建产物 ----
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ---- 虚拟环境 ----
+.venv/
+venv/
+env/
+
+# ---- 测试 / 类型检查缓存 ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# ---- SDK 本地运行时状态（提交的任务记录、日志、临时文件）----
+.phi_jobs/
+
+# ---- 编辑器 / 系统 ----
+.DS_Store
+.idea/
+.vscode/
+*.swp
